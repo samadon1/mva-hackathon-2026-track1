@@ -87,17 +87,21 @@ def genomewide_plp(vcf_path):
                     print(f"  {fl[0]}:{fl[1]} {fl[3]}>{alt} GT={fl[9].split(':')[0]} {d.get('GENEINFO','?')[:30]} {d.get('CLNDN','?')[:60]}")
 
 
-def aneuploidy_scan(vcf_path):
-    print("== per-chromosome depth / het-BAF scan (mosaic aneuploidy) ==")
-    chroms = [str(i) for i in range(1, 23)] + ["X"]
-    baf = {c: [] for c in chroms}
-    dp = {c: [0, 0] for c in chroms}
+def aneuploidy_scan(vcf_path, bin_size=10_000_000, artifact_ratio=1.3):
+    """Robust mosaic-aneuploidy scan: per-bin MEDIAN depth (outlier repeat bins excluded)
+    plus a heterozygous allele-fraction shape test. Naive per-chromosome mean depth is
+    misleading here: repeat-dense bins on the acrocentric chromosomes inflate means."""
+    print("== robust per-chromosome depth / het-BAF scan (mosaic aneuploidy) ==")
+    import collections
+    chroms = [str(i) for i in range(1, 23)]
+    dp_bin = collections.defaultdict(list)
+    baf_bin = collections.defaultdict(list)
     with gzip.open(vcf_path, "rt") as f:
         for line in f:
             if line.startswith("#"):
                 continue
             fl = line.rstrip("\n").split("\t")
-            if fl[0] not in baf or fl[6] != "PASS":
+            if fl[0] not in chroms or fl[6] != "PASS":
                 continue
             smp = fl[9].split(":")
             try:
@@ -105,20 +109,24 @@ def aneuploidy_scan(vcf_path):
             except (ValueError, IndexError):
                 continue
             d = sum(ad)
-            if d < 15:
+            if d < 15 or d > 80:
                 continue
-            dp[fl[0]][0] += d
-            dp[fl[0]][1] += 1
-            if smp[0] == "0/1" and len(ad) == 2 and d <= 80:
-                baf[fl[0]].append(ad[1] / d)
-    base = statistics.median(dp[c][0] / max(dp[c][1], 1) for c in chroms[:22])
+            key = (fl[0], int(fl[1]) // bin_size)
+            dp_bin[key].append(d)
+            if smp[0] == "0/1" and len(ad) == 2:
+                baf_bin[key].append(ad[1] / d)
+    med = {k: statistics.median(v) for k, v in dp_bin.items() if len(v) > 2000}
+    base = statistics.median(med.values())
+    print(f"  baseline bin-median DP {base:.1f}")
     for c in chroms:
-        if not baf[c]:
+        good = [k for k in med if k[0] == c and med[k] / base < artifact_ratio]
+        if not good:
             continue
-        mdp = dp[c][0] / max(dp[c][1], 1)
-        sd = statistics.pstdev(baf[c])
-        flag = " <-- deviates" if (abs(statistics.median(baf[c]) - 0.5) > 0.03 or sd > 0.13 or abs(mdp / base - 1) > 0.06) else ""
-        print(f"  chr{c:<3} nhet={len(baf[c]):>7} medBAF={statistics.median(baf[c]):.3f} sdBAF={sd:.3f} meanDP={mdp:6.1f} ({mdp/base:+.0%} vs baseline){flag}")
+        r = statistics.median(med[k] / base for k in good)
+        bafs = [x for k in good for x in baf_bin.get(k, [])]
+        tail = sum(1 for x in bafs if x < 0.35 or x > 0.65) / max(len(bafs), 1)
+        flag = "  <-- allelic imbalance" if (r > 1.03 or tail > 0.13) else ""
+        print(f"  chr{c:<3} bins={len(good):>3} med_depth_ratio={r:.3f} BAF_tail_frac={tail:.3f}{flag}")
 
 
 def main():

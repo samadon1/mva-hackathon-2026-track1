@@ -19,14 +19,21 @@ with a rarer missense allele on the other copy, is the configuration most often 
 *BUB1B*-related MVA (Matsuura et al. described the pattern of one null allele plus one
 reduced-function allele).
 
-**The same file also shows the aneuploidy itself.** A per-chromosome depth and allele-fraction scan
-of the WGS finds chromosome-level gains consistent with mosaic trisomies in blood: chr21 mean depth
-55.8x against a 43.1x autosomal baseline (a 29% excess), with chr22 up 21%, chr20 up 16%, and chr16
-up 16%. Each of these chromosomes also shows a wider spread of heterozygous allele fractions
-(population standard deviation 0.116 to 0.120, against a baseline near 0.092) and a slightly
-depressed median alternate fraction. GC bias does not explain the pattern, because the GC-rich
-chr19 sits at baseline depth. So the variant-level diagnosis and the chromosomal phenotype are both
-visible in one dataset, independently of each other.
+**The same file also carries a low-level signature of the aneuploidy.** A naive per-chromosome
+mean-depth scan first suggested large gains on chr16, chr20, chr21 and chr22, but binned analysis
+showed those means were driven by a handful of repeat-dense outlier regions (depth ratios up to 6x
+in single 10 Mb bins on the acrocentric and heterochromatin-rich chromosomes), so we discarded that
+result and repeated the scan robustly: per-bin median depth with outlier bins (ratio above 1.3)
+excluded, plus a heterozygous allele-fraction shape test. In the robust scan every chromosome sits
+at a depth ratio of 1.000 to 1.023, which rules out any high-fraction trisomy in bulk blood. What
+remains is a reproducible allelic-imbalance signal on chr20 and chr22: the fraction of heterozygous
+sites with allele fractions outside 0.35 to 0.65 rises to 0.177 and 0.163 against a genome baseline
+near 0.09, together with the small (about 2%) depth lift on the same two chromosomes. Both
+observations fit mosaic gains of chr20 and chr22 in roughly 5% of nucleated blood cells. That is a
+modest signal, and we report it as such, but it is the direction MVA predicts, and per-cell
+karyotype variability with lineage-dependent fractions is the expected picture in this syndrome. It
+also suggests a practical follow-up: serial low-pass WGS or cfDNA of this kind could track
+aneuploidy burden over time as a cheap, quantitative biomarker.
 
 **Alternative second alleles (ranks 2 and 3), kept as hedges:**
 - chr15:40192892 C>T, an intronic *BUB1B* variant of uncertain significance (rs185599777,

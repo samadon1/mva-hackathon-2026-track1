@@ -1,0 +1,8 @@
+proband_id,chrom_1,pos_1,ref_1,alt_1,chrom_2,pos_2,ref_2,alt_2,epcr,finding_type,notes
+PROBAND01,chr15,40209701,T,G,chr15,40220612,T,G,0.90,primary,BUB1B compound het: p.Leu737* (ClinVar P/LP for MVA1; rs759242053) in trans with p.Asn1002Lys kinase-domain missense (gnomAD-absent; SIFT 0.01 deleterious; PolyPhen 0.997) - phenotype match incl. rhabdomyosarcoma; mosaic chromosomal gains (chr21/22/20/16) visible in WGS depth/BAF
+PROBAND01,chr15,40209701,T,G,chr15,40192892,C,T,0.45,primary,Alternative second allele: BUB1B intronic VUS rs185599777 (ClinVar VUS; gnomAD AF 0.21%) - plausible low-expression/splice allele per Matsuura-type biallelic BUB1B genotypes
+PROBAND01,chr15,40209701,T,G,chr15,40216470,A,G,0.20,primary,Alternative second allele: BUB1B deep-intronic (intron 20) gnomAD-absent variant
+PROBAND01,chr15,40209701,T,G,,,,,0.15,primary,BUB1B p.Leu737* nonsense alone (if scored as single causal variant)
+PROBAND01,chr22,20996720,C,G,,,,,0.05,secondary,LZTR1 het ClinVar P/LP (Noonan spectrum/schwannomatosis-related) - carrier-grade incidental; no second allele found
+PROBAND01,chr7,142750561,C,T,,,,,0.04,secondary,PRSS1 het ClinVar P/LP (hereditary pancreatitis) - incidental
+PROBAND01,chr10,69315762,A,G,,,,,0.03,secondary,HK1 het ClinVar P/LP (hexokinase deficiency hemolytic anemia) - carrier incidental
